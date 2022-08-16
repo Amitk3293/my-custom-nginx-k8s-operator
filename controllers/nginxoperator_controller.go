@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -25,6 +26,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	operatorv1alpha1 "github.com/Amitk3293/my-custom-nginx-k8s-operator/api/v1alpha1"
+	"github.com/Amitk3293/my-custom-nginx-k8s-operator/assets"
 )
 
 // NginxOperatorReconciler reconciles a NginxOperator object
@@ -46,12 +48,57 @@ type NginxOperatorReconciler struct {
 //
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.1/pkg/reconcile
+
 func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	_ = log.FromContext(ctx)
 
 	// TODO(user): your logic here
 
-	return ctrl.Result{}, nil
+	// Get the Nginx Operator resource object.
+	logger := log.FromContext(ctx)
+	operatorCR := &operatorv1alpha1.NginxOperator{}
+	err := r.Get(ctx, req.NamespacedName, operatorCR)
+	// If one is not found, log a message and terminate the reconciliation attempt.
+	if err != nil && errors.IsNotFound(err) {
+		logger.Info("Operator resource object not found.")
+		return ctrl.Result{}, nil
+		// If there are any other errors retrieving the object, return an error, re-queued and tried again.
+	} else if err != nil {
+		logger.Error(err, "Error getting operator resource object")
+		return ctrl.Result{}, err
+	}
+
+	// Check if the deployment exist,
+	deployment := &appsv1.Deployment{}
+	create := false
+	err = r.Get(ctx, req.NamespacedName, deployment)
+	// if not, and create == false -> error, if create == true -> create from manifest files.
+	if err != nil && errors.IsNotFound(err) {
+		create = true
+		deployment = assets.GetDeploymentFromFile("assets/nginx_deployment.yaml")
+	} else if err != nil {
+		logger.Error(err, "Error getting existing Nginx deployment.")
+		return ctrl.Result{}, err
+	}
+	// Check if replicas configured in the crd, if so use it.
+	deployment.Namespace = req.Namespace
+	deployment.Name = req.Name
+	if operatorCR.Spec.Replicas != nil {
+		deployment.Spec.Replicas = operatorCR.Spec.Replicas
+	}
+	// Check if ports configured in the crd, if so use it.
+
+	if operatorCR.Spec.Port != nil {
+		deployment.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort = *operatorCR.Spec.Port
+	}
+	ctrl.SetControllerReference(operatorCR, deployment, r.Scheme)
+	// Check if deployment is going to be modified or to create.
+	if create {
+		err = r.Create(ctx, deployment)
+	} else {
+		err = r.Update(ctx, deployment)
+	}
+	return ctrl.Result{}, err
 }
 
 // SetupWithManager sets up the controller with the Manager.
