@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 
+	appsv1 "k8s.io/api/apps/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -107,5 +108,7 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 func (r *NginxOperatorReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&operatorv1alpha1.NginxOperator{}).
+		// trigger calls to Reconcile() for changes to deployments objects.
+		Owns(&appsv1.Deployment{}).
 		Complete(r)
 }

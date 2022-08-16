@@ -22,33 +22,20 @@ import (
 
 	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
 	// to ensure that exec-entrypoint and run can make use of them.
-	appsv1 "k8s.io/api/apps/v1"
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	operatorv1alpha1 "github.com/Amitk3293/my-custom-nginx-k8s-operator/api/v1alpha1"
 	"github.com/Amitk3293/my-custom-nginx-k8s-operator/controllers"
-
 	//+kubebuilder:scaffold:imports
-	"embed"
 )
 
-//go:embed assets/nginx_deployment.yaml
-var deployment embed.FS
-<<<<<<< HEAD
-=======
-
-var (
-	appsScheme = runtime.NewScheme()
-	appsCodecs = serializer.NewCodecFactory(appsScheme)
-)
->>>>>>> e9d085c7fc4db92be78e81237440b26648e31ba3
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
@@ -62,18 +49,6 @@ func init() {
 }
 
 func main() {
-	if err := appsv1.AddToScheme(appsScheme); err != nil {
-		panic(err)
-	}
-	deploymentBytes, err := deployment.ReadFile("assets/nginx_deployment.yaml")
-	if err != nil {
-		panic(err)
-	}
-	deploymentObject, err := runtime.Decode(appsCodecs.UniversalDecoder(appsv1.SchemeGroupVersion), deploymentBytes)
-	if err != nil {
-		panic(err)
-	}
-	dep := deploymentObject.(*appsv1.Deployment)
 	var metricsAddr string
 	var enableLeaderElection bool
 	var probeAddr string
