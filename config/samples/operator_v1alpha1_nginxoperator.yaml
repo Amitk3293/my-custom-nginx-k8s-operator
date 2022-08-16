@@ -1,0 +1,6 @@
+apiVersion: operator.amitk.link/v1alpha1
+kind: NginxOperator
+metadata:
+  name: nginxoperator-sample
+spec:
+  # TODO(user): Add fields here
