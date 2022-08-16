@@ -38,6 +38,7 @@ type NginxOperatorReconciler struct {
 //+kubebuilder:rbac:groups=operator.amitk.link,resources=nginxoperators,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=operator.amitk.link,resources=nginxoperators/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=operator.amitk.link,resources=nginxoperators/finalizers,verbs=update
+//+kubebuilder:rbac:groups=apps,resources=deployments,verbs=get;list;watch;create;update;patch;delete
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -91,6 +92,7 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 	if operatorCR.Spec.Port != nil {
 		deployment.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort = *operatorCR.Spec.Port
 	}
+
 	ctrl.SetControllerReference(operatorCR, deployment, r.Scheme)
 	// Check if deployment is going to be modified or to create.
 	if create {
