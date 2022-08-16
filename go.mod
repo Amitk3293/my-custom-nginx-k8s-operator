@@ -1,4 +1,4 @@
-module github.com/Amitk3293/nginx-operator
+module github.com/Amitk3293/my-custom-nginx-k8s-operator
 
 go 1.18
 

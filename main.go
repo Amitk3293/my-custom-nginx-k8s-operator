@@ -31,15 +31,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	operatorv1alpha1 "github.com/Amitk3293/nginx-operator/api/v1alpha1"
-	"github.com/Amitk3293/nginx-operator/controllers"
-
+	operatorv1alpha1 "github.com/Amitk3293/my-custom-nginx-k8s-operator/api/v1alpha1"
+	"github.com/Amitk3293/my-custom-nginx-k8s-operator/controllers"
 	//+kubebuilder:scaffold:imports
-	"embed"
 )
-
-//go:embed assets/nginx_deployment.yaml
-var deployment embed.FS
 
 var (
 	scheme   = runtime.NewScheme()
@@ -76,7 +71,7 @@ func main() {
 		Port:                   9443,
 		HealthProbeBindAddress: probeAddr,
 		LeaderElection:         enableLeaderElection,
-		LeaderElectionID:       "c1e34d37.amitk.link",
+		LeaderElectionID:       "3b2d531d.amitk.link",
 		// LeaderElectionReleaseOnCancel defines if the leader should step down voluntarily
 		// when the Manager ends. This requires the binary to immediately end when the
 		// Manager is stopped, otherwise, this setting is unsafe. Setting this significantly

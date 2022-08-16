@@ -24,7 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	operatorv1alpha1 "github.com/Amitk3293/nginx-operator/api/v1alpha1"
+	operatorv1alpha1 "github.com/Amitk3293/my-custom-nginx-k8s-operator/api/v1alpha1"
 )
 
 // NginxOperatorReconciler reconciles a NginxOperator object

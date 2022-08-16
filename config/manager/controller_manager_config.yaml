@@ -8,7 +8,7 @@ webhook:
   port: 9443
 leaderElection:
   leaderElect: true
-  resourceName: c1e34d37.amitk.link
+  resourceName: 3b2d531d.amitk.link
 #   leaderElectionReleaseOnCancel defines if the leader should step down volume 
 #   when the Manager ends. This requires the binary to immediately end when the
 #   Manager is stopped, otherwise, this setting is unsafe. Setting this significantly
