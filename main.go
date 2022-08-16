@@ -33,9 +33,13 @@ import (
 
 	operatorv1alpha1 "github.com/Amitk3293/my-custom-nginx-k8s-operator/api/v1alpha1"
 	"github.com/Amitk3293/my-custom-nginx-k8s-operator/controllers"
+
 	//+kubebuilder:scaffold:imports
+	"embed"
 )
 
+//go:embed assets/nginx_deployment.yaml
+var deployment embed.FS
 var (
 	scheme   = runtime.NewScheme()
 	setupLog = ctrl.Log.WithName("setup")
