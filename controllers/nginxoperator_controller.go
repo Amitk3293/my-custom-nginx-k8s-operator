@@ -18,9 +18,9 @@ package controllers
 
 import (
 	"context"
-	"errors"
 
 	appsv1 "k8s.io/api/apps/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -52,12 +52,12 @@ type NginxOperatorReconciler struct {
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.12.1/pkg/reconcile
 
 func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	_ = log.FromContext(ctx)
+	// _ = log.FromContext(ctx)
+	logger := log.FromContext(ctx)
 
 	// TODO(user): your logic here
 
 	// Get the Nginx Operator resource object.
-	logger := log.FromContext(ctx)
 	operatorCR := &operatorv1alpha1.NginxOperator{}
 	err := r.Get(ctx, req.NamespacedName, operatorCR)
 	// If one is not found, log a message and terminate the reconciliation attempt.
@@ -82,14 +82,16 @@ func (r *NginxOperatorReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		logger.Error(err, "Error getting existing Nginx deployment.")
 		return ctrl.Result{}, err
 	}
+
 	// Check if replicas configured in the crd, if so use it.
 	deployment.Namespace = req.Namespace
 	deployment.Name = req.Name
+
 	if operatorCR.Spec.Replicas != nil {
 		deployment.Spec.Replicas = operatorCR.Spec.Replicas
 	}
-	// Check if ports configured in the crd, if so use it.
 
+	// Check if ports configured in the crd, if so use it.
 	if operatorCR.Spec.Port != nil {
 		deployment.Spec.Template.Spec.Containers[0].Ports[0].ContainerPort = *operatorCR.Spec.Port
 	}
